@@ -35,7 +35,7 @@ public class SummonExecutor implements CommandExecutor {
             super(CreatureType.COW.getName(),
                   CreatureType.CHICKEN.getName(),
                   CreatureType.CREEPER.getName(),
-                  CreatureType.VILLAGER.getName());
+                  "None");
         }
 
         public String getPromptText(ConversationContext context) {
@@ -44,6 +44,9 @@ public class SummonExecutor implements CommandExecutor {
 
         @Override
         protected Prompt acceptValidatedInput(ConversationContext context, String s) {
+            if (s.equals("None")) {
+                return Prompt.END_OF_CONVERSATION;
+            }
             context.getSessionData().put("type", s);
             return new HowManyPrompt();
         }
