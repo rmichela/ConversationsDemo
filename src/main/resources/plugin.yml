@@ -1,0 +1,7 @@
+name: ConversationsDemo
+version: 1.0
+main: com.ryanmichela.conversationsdemo.ConvoPlugin
+
+commands:
+  summon:
+    description: Summons monsters.
