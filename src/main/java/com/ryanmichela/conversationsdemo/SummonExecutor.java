@@ -18,7 +18,9 @@ public class SummonExecutor implements CommandExecutor {
         this.conversationFactory = new ConversationFactory()
                 .withModality(true)
                 .withPrefix(new PluginNameConversationPrefix(plugin))
-                .withFirstPrompt(new WhichMobPrompt());
+                .withFirstPrompt(new WhichMobPrompt())
+                .withEscapeSequence("/quit")
+                .thatExcludesNonPlayersWithMessage("Go away evil console!");
     }
     
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -47,14 +49,14 @@ public class SummonExecutor implements CommandExecutor {
             if (s.equals("None")) {
                 return Prompt.END_OF_CONVERSATION;
             }
-            context.getSessionData().put("type", s);
+            context.setSessionData("type", s);
             return new HowManyPrompt();
         }
     }
 
     private class HowManyPrompt extends NumericPrompt {
         public String getPromptText(ConversationContext context) {
-            return "How many " + context.getSessionData().get("type") + "s would you like to summon?";
+            return "How many " + context.getSessionData("type") + "s would you like to summon?";
         }
 
         @Override
@@ -69,7 +71,7 @@ public class SummonExecutor implements CommandExecutor {
 
         @Override
         protected Prompt acceptValidatedInput(ConversationContext context, Number number) {
-            context.getSessionData().put("count", number.intValue());
+            context.setSessionData("count", number.intValue());
             return new ForWhomPrompt(plugin);
         }
     }
@@ -80,12 +82,12 @@ public class SummonExecutor implements CommandExecutor {
         }
 
         public String getPromptText(ConversationContext context) {
-            return "Who should receive your " + context.getSessionData().get("type") + "s?";
+            return "Who should receive your " + context.getSessionData("type") + "s?";
         }
 
         @Override
         protected Prompt acceptValidatedInput(ConversationContext context, Player player) {
-            context.getSessionData().put("who", player);
+            context.setSessionData("who", player);
             return new SummonedPrompt();
         }
 
@@ -97,9 +99,9 @@ public class SummonExecutor implements CommandExecutor {
 
     private class SummonedPrompt extends MessagePrompt {
         public String getPromptText(ConversationContext context) {
-            Player who = (Player)context.getSessionData().get("who");
-            String what = (String)context.getSessionData().get("type");
-            int count = (Integer)context.getSessionData().get("count");
+            Player who = (Player)context.getSessionData("who");
+            String what = (String)context.getSessionData("type");
+            int count = (Integer)context.getSessionData("count");
 
             for (int i = 0; i < count; i++) {
                 World world = who.getWorld();
