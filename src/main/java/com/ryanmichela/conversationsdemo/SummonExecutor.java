@@ -15,11 +15,12 @@ public class SummonExecutor implements CommandExecutor {
 
     public SummonExecutor(Plugin plugin) {
         this.plugin = plugin;
-        this.conversationFactory = new ConversationFactory()
+        this.conversationFactory = new ConversationFactory(plugin)
                 .withModality(true)
                 .withPrefix(new PluginNameConversationPrefix(plugin))
                 .withFirstPrompt(new WhichMobPrompt())
                 .withEscapeSequence("/quit")
+                .withTimeout(10)
                 .thatExcludesNonPlayersWithMessage("Go away evil console!");
     }
     
