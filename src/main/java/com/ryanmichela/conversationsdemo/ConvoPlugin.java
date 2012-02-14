@@ -1,5 +1,6 @@
 package com.ryanmichela.conversationsdemo;
 
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -84,7 +85,7 @@ public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
         @Override
         protected Prompt acceptValidatedInput(ConversationContext context, Number number) {
             context.setSessionData("count", number.intValue());
-            return new ForWhomPrompt(ConvoPlugin.this);
+            return new ForWhomPrompt(context.getPlugin());
         }
     }
 
@@ -137,15 +138,15 @@ public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
             Player who = (Player)context.getSessionData("who");
             
             if (what != null && count == null && who == null) {
-                return "Summon " + what + ": ";
+                return ChatColor.GREEN + "Summon " + what + ": " + ChatColor.WHITE;
             }
             if (what != null && count != null && who == null) {
-                return "Summon " + count + " " + what + ": ";
+                return ChatColor.GREEN + "Summon " + count + " " + what + ": " + ChatColor.WHITE;
             }
             if (what != null && count != null && who != null) {
-                return "Summon " + count + " " + what + " to " + who.getName() + ": ";
+                return ChatColor.GREEN + "Summon " + count + " " + what + " to " + who.getName() + ": " + ChatColor.WHITE;
             }
-            return "Summon: ";
+            return ChatColor.GREEN + "Summon: " + ChatColor.WHITE;
         }
     }
 }
