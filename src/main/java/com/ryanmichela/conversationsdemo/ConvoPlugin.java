@@ -6,14 +6,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.conversations.*;
-import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  */
-public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
+public class ConvoPlugin extends JavaPlugin implements CommandExecutor, ConversationAbandonedListener {
 
     public void onEnable() {
         getCommand("summon").setExecutor(this);
@@ -33,7 +33,8 @@ public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
                 .withFirstPrompt(new WhichMobPrompt())
                 .withEscapeSequence("/quit")
                 .withTimeout(10)
-                .thatExcludesNonPlayersWithMessage("Go away evil console!");
+                .thatExcludesNonPlayersWithMessage("Go away evil console!")
+                .addConversationAbandonedListener(this);
     }
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -45,11 +46,20 @@ public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
         }
     }
 
+    public void ConversationAbandoned(ConversationAbandonedEvent abandonedEvent) {
+        if (abandonedEvent.gracefulExit()) {
+            abandonedEvent.getContext().getForWhom().sendRawMessage("Conversation exited gracefully.");
+        } else {
+            abandonedEvent.getContext().getForWhom().sendRawMessage("Conversation abandoned by" + abandonedEvent.getCanceller().getClass().getName());
+        }
+    }
+
+    // Below are all the prompt implementations for making a conversation tree
     private class WhichMobPrompt extends FixedSetPrompt {
         public WhichMobPrompt() {
-            super(CreatureType.COW.getName(),
-                    CreatureType.CHICKEN.getName(),
-                    CreatureType.CREEPER.getName(),
+            super(EntityType.COW.getName(),
+                    EntityType.CHICKEN.getName(),
+                    EntityType.CREEPER.getName(),
                     "None");
         }
 
@@ -118,7 +128,7 @@ public class ConvoPlugin extends JavaPlugin implements CommandExecutor {
 
             for (int i = 0; i < count; i++) {
                 World world = who.getWorld();
-                world.spawnCreature(who.getLocation(), CreatureType.fromName(what));
+                world.spawnCreature(who.getLocation(), EntityType.fromName(what));
             }
 
             return "Engage!";
